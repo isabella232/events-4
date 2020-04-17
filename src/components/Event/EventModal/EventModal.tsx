@@ -24,7 +24,7 @@ export default function EventModal({ event, attendees, share, edit, className, o
       <div className="EventModal__Action__Background" />
       <img src={close} width="14" height="14" />
     </div>}
-    {event && !attendees && !share && <EventDetail event={event} edit={edit} />}
+    {event && !attendees && !share && <EventDetail event={event} edit={edit} hideCountdown />}
     {event && attendees && !share && <EventAttendeeList event={event} />}
     {event && !attendees && share && <EventShare event={event} />}
   </Modal>

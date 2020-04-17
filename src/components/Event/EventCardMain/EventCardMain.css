@@ -1,0 +1,83 @@
+.ui.card.EventCardMain {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  cursor: auto;
+}
+
+.ui.card.EventCardMain .date {
+  font-size: 13px;
+  font-weight: 600;
+  color: #736e7d;
+}
+
+.ui.card.EventCardMain > :first-child,
+.ui.cards > .card.EventCardMain > :first-child,
+.ui.card.EventCardMain .dg.ImgFixed {
+  border-radius: 8px 0 0 8px !important;
+  width: 60%;
+}
+
+.ui.card.EventCardMain .EventDetail {
+  width: 40%;
+}
+
+.ui.card.EventCardMain .EventDetail__Description {
+  max-height: 150px;
+  overflow: auto;
+}
+
+.ui.card.EventCardMain.pending {
+  opacity: 0.7;
+  background: #eee;
+}
+
+.ui.card.EventCardMain .EventCardMain__Attendees {
+  position: absolute;
+  z-index: 100;
+  top: 12px;
+  right: 22px;
+}
+
+.ui.card.EventCardMain .EventCardMain__Attendees > * {
+  margin-right: -10px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.ui.card.EventCardMain
+  .EventCardMain__Attendees
+  .EventCardMain__Attendees__More {
+  display: inline-block;
+  min-width: 20px;
+  height: 20px;
+  background: #37333d;
+  color: white;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0 0.4em;
+  box-sizing: content-box;
+  top: 2px;
+  position: relative;
+}
+
+@media only screen and (max-width: 767px) {
+  .ui.card.EventCardMain {
+    flex-direction: column;
+  }
+
+  .ui.card.EventCardMain > :first-child,
+  .ui.cards > .card.EventCardMain > :first-child,
+  .ui.card.EventCardMain .dg.ImgFixed {
+    border-radius: 8px 8px 0 0 !important;
+  }
+
+  .ui.card.EventCardMain .dg.ImgFixed,
+  .ui.card.EventCardMain .EventDetail {
+    width: 100%;
+  }
+
+  .ui.card.EventCardMain .EventDetail__Description {
+    max-height: 500px;
+    overflow: auto;
+  }
+}

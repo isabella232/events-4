@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { navigate } from 'gatsby'
 import { useLocation } from '@reach/router'
 import isEmail from 'validator/lib/isEmail'
@@ -11,9 +11,10 @@ import Divider from 'decentraland-gatsby/dist/components/Text/Divider'
 import Italic from 'decentraland-gatsby/dist/components/Text/Italic'
 import Link from 'decentraland-gatsby/dist/components/Text/Link'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
-import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
 import track from 'decentraland-gatsby/dist/components/Segment/track'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
+import useCountdown from 'decentraland-gatsby/dist/hooks/useCountdown'
 import { EventAttributes } from '../../../../entities/Event/types'
 import { toMonthName, toDayName, toTimezoneName } from '../../../Date/utils'
 import AttendingButtons from '../../../Button/AttendingButtons'
@@ -27,6 +28,7 @@ import stores from '../../../../utils/store'
 import * as segment from '../../../../utils/segment'
 
 import './EventDetail.css'
+import Bold from 'decentraland-gatsby/dist/components/Text/Bold'
 
 const extra = require('../../../../images/info.svg')
 const info = require('../../../../images/secondary-info.svg')
@@ -43,6 +45,15 @@ const EVENTS_LIST = 11
 export type EventDetailProps = {
   event: EventAttributes,
   edit?: boolean
+  hideImage?: boolean
+  hideDescription?: boolean
+  hidePlace?: boolean
+  hideDate?: boolean
+  hideCountdown?: boolean
+  hideAttendees?: boolean
+  hideContact?: boolean
+  hideDetails?: boolean
+  hideEdit?: boolean
 }
 
 export type EventDetailState = {
@@ -51,15 +62,16 @@ export type EventDetailState = {
 }
 
 export default function EventDetail({ event, ...props }: EventDetailProps) {
-  const now = new Date()
+  const now = useMemo(() => new Date(), [])
   const { start_at, finish_at } = event || { start_at: now, finish_at: now }
   const duration = finish_at.getTime() - start_at.getTime()
   const position = (event?.coordinates || [0, 0]).join()
   const attendeesDiff = event.total_attendees - EVENTS_LIST
   const location = useLocation()
   const [profile] = useProfile()
+  const countdown = useCountdown(start_at)
   const [state, setState] = useState<EventDetailState>({})
-  const editable = (event as any).editable
+  const editable = (event as any).editable && !props.hideEdit
   const owner = event.user.toLowerCase() === profile?.address.toString().toLowerCase()
   const canSeeDetails = editable || owner
   const edit = editable && props.edit
@@ -123,7 +135,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   }
 
   return <>
-    {event && <ImgFixed src={edited.image} dimension="wide" />}
+    {event && !props.hideImage && <ImgFixed src={edited.image} dimension="wide" />}
     {event && !edit && event.rejected && <div className="EventError"><code>This event was rejected</code></div>}
     {event && !edit && !event.rejected && !event.approved && <div className="EventNote"><code>This event is pending approval</code></div>}
     {event && <div className={'EventDetail'}>
@@ -131,7 +143,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         < input name="image" className={edited.errors['image'] && 'error'} defaultValue={edited.image || ''} onChange={actions.handleChange} />
         {edited.errors['image'] && <Paragraph className="error" >{edited.errors['image']}</Paragraph>}
       </div>}
-      <div className="EventDetail__Header">
+      <div className="EventDetail__Header EventDetail__Title">
         <DateBox date={start_at} />
         <div className="EventDetail__Header__Event">
           {edit && <>
@@ -148,8 +160,8 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       </div>
 
       {/* DESCRIPTION */}
-      <Divider line />
-      <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+      {!props.hideDescription && <Divider line />}
+      {!props.hideDescription && <div className={TokenList.join(['EventDetail__Description', 'EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={info} width="16" height="16" />
         </div>
@@ -164,11 +176,11 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           {!edit && event.description && <Markdown source={event.description} />}
         </div>
         <div className="EventDetail__Detail__Action"></div>
-      </div>
+      </div>}
 
       {/* DATE */}
-      <Divider line />
-      <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+      {!props.hideDate && <Divider line />}
+      {!props.hideDate && <div className={TokenList.join(['EventDetail__Date', 'EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={clock} width="16" height="16" />
         </div>
@@ -256,11 +268,25 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         {!edit && <div className="EventDetail__Detail__Action">
           <AddToCalendarButton event={event} />
         </div>}
-      </div>
+      </div>}
+
+      {/* COUNTDOWN */}
+      {!props.hideCountdown && <Divider line />}
+      {!props.hideCountdown && <div className={TokenList.join(['EventDetail__Date', 'EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+        <div className="EventDetail__Detail__Icon">
+          <img src={clock} width="16" height="16" />
+        </div>
+        <div className="EventDetail__Detail__Item">
+          <Paragraph>Start in: <Bold>{countdown.days}d {countdown.hours}:{countdown.minutes}:{countdown.seconds}</Bold></Paragraph>
+        </div>
+        {!edit && <div className="EventDetail__Detail__Action">
+          <AddToCalendarButton event={event} />
+        </div>}
+      </div>}
 
       {/* PLACE */}
-      <Divider line />
-      <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+      {!props.hidePlace && <Divider line />}
+      {!props.hidePlace && <div className={TokenList.join(['EventDetail__Place', 'EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={pin} width="16" height="16" />
         </div>
@@ -278,11 +304,11 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         {!edit && <div className="EventDetail__Detail__Action">
           <JumpInButton size="small" event={event} />
         </div>}
-      </div>
+      </div>}
 
       {/* EVENT TARGET */}
       {edit && <Divider line />}
-      {edit && <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+      {edit && <div className={TokenList.join(['EventDetail__JumpIn', 'EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={jump} width="16" height="16" />
         </div>
@@ -295,8 +321,8 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
 
       {/* ATTENDEES */}
-      <Divider line />
-      <div className="EventDetail__Detail">
+      {!props.hideAttendees && <Divider line />}
+      {!props.hideAttendees && <div className="EventDetail__Attendees EventDetail__Detail">
         <div className={TokenList.join(['EventDetail__Detail__Icon', event.total_attendees > 0 && 'center'])}>
           <img src={friends} width="16x" height="16" />
         </div>
@@ -313,11 +339,11 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           </div>}
         </div>
         <div className="EventDetail__Detail__Action" />
-      </div>
+      </div>}
 
       {/* CONTACT */}
-      {!event.approved && canSeeDetails && <Divider line />}
-      {!event.approved && canSeeDetails && <div className={TokenList.join(['EventDetail__Detail', 'extra', edit && 'EventDetail__Detail--edit'])}>
+      {!props.hideContact && !event.approved && canSeeDetails && <Divider line />}
+      {!props.hideContact && !event.approved && canSeeDetails && <div className={TokenList.join(['EventDetail__Contact', 'EventDetail__Detail', 'extra', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={extra} width="16" height="16" />
         </div>
@@ -335,8 +361,8 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       </div>}
 
       {/* DETAILS */}
-      {!event.approved && canSeeDetails && <Divider line />}
-      {!event.approved && canSeeDetails && <div className={TokenList.join(['EventDetail__Detail', 'extra', edit && 'EventDetail__Detail--edit'])}>
+      {!props.hideDetails && !event.approved && canSeeDetails && <Divider line />}
+      {!props.hideDetails && !event.approved && canSeeDetails && <div className={TokenList.join(['EventDetail__Extra', 'EventDetail__Detail', 'extra', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={extra} width="16" height="16" />
         </div>

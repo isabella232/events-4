@@ -23,6 +23,7 @@ import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
 import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
+import EventCardMain from "../components/Event/EventCardMain/EventCardMain"
 import useListEvents from '../hooks/useListEvents'
 import useListEventsByMonth from '../hooks/useListEventsByMonth'
 import { EventAttributes } from "../entities/Event/types"
@@ -50,9 +51,9 @@ export default function IndexPage(props: any) {
   const state = useEntityStore(stores.event)
   const events = useListEvents(state.data)
   const eventsByMonth = useListEventsByMonth(events)
+  const nextEvent = useMemo(() => events.find(event => event.approved && !event.rejected) || null, [events])
   const myEvents = useMemo(() => events.filter((event: EventAttributes) => profile && event.user === profile.address.toString()), [state])
   const attendingEvents = useMemo(() => events.filter((event: any) => !!event.attending), [state])
-  const happeningEvents = useMemo(() => events.filter(event => event.approved && !event.rejected && event.start_at.getTime() <= now && event.finish_at.getTime() >= now), [state])
   const currentEvent = eventId && state.data[eventId] || null
 
   const [requireWallet, setRequireWallet] = useState(false)
@@ -113,20 +114,19 @@ export default function IndexPage(props: any) {
           <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
           <Divider />
         </>}
-        {!state.loading && events.length > 0 && attendingEvents.length > 0 && <>
-          <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
-          <Card.Group>
-            {attendingEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} />)}
-          </Card.Group></>}
         {!state.loading && events.length > 0 && myEvents.length > 0 && <>
           <div className="GroupTitle"><SubTitle>MY EVENTS</SubTitle></div>
           <Card.Group>
             {myEvents.map(event => <EventCardMini key={'my:' + event.id} event={event} />)}
           </Card.Group></>}
-        {!state.loading && events.length > 0 && happeningEvents.length > 0 && <>
-          <div className="GroupTitle"><SubTitle>AT THIS MOMENT</SubTitle></div>
+        {!state.loading && nextEvent && <>
+          <div className="GroupTitle"><SubTitle>NEXT EVENT</SubTitle></div>
+          <EventCardMain event={nextEvent} />
+        </>}
+        {!state.loading && events.length > 0 && attendingEvents.length > 0 && <>
+          <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
           <Card.Group>
-            {happeningEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} />)}
+            {attendingEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} />)}
           </Card.Group></>}
         {!state.loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <>
           <div className="GroupTitle">
