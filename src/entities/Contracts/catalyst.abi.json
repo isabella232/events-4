@@ -1,5 +1,4 @@
-import { ContractAbi } from 'web3x/contract';
-export default new ContractAbi([
+[
   {
     "constant": true,
     "inputs": [
@@ -488,4 +487,4 @@ export default new ContractAbi([
     "name": "RecoverToVault",
     "type": "event"
   }
-]);
+]

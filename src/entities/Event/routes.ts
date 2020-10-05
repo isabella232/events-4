@@ -1,26 +1,26 @@
-import { utils } from 'decentraland-commons';
+import { utils } from 'decentraland-commons'
 import env from 'decentraland-gatsby/dist/utils/env'
 import Land from 'decentraland-gatsby/dist/utils/api/Land'
-import { v4 as uuid } from 'uuid';
-import EventModel from './model';
+import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst'
+import { v4 as uuid } from 'uuid'
+import EventModel from './model'
 import { eventTargetUrl, calculateRecurrentProperties } from './utils'
-import routes from "decentraland-gatsby/dist/entities/Route/routes";
-import EventAttendee from '../EventAttendee/model';
-import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
-import { auth, WithAuth } from 'decentraland-gatsby/dist/entities/Auth/middleware';
-import { EventAttributes, adminPatchAttributes, patchAttributes, EventListOptions, DeprecatedEventAttributes, RecurrentEventAttributes, MAX_EVENT_RECURRENT, SessionEventAttributes } from './types';
-import { withEvent, WithEvent } from './middleware';
-import isAdmin from '../Auth/isAdmin';
-import handle from 'decentraland-gatsby/dist/entities/Route/handle';
-import { bool, integer } from 'decentraland-gatsby/dist/entities/Route/param';
-import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
-import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
-import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent, notifyEventError } from '../Slack/utils';
-import { Request } from 'express';
-import Context from 'decentraland-gatsby/dist/entities/Route/context';
-import isEthereumAddress from 'validator/lib/isEthereumAddress';
-import EventAttendeeModel from '../EventAttendee/model';
-import { EventAttendeeAttributes } from '../EventAttendee/types';
+import routes from 'decentraland-gatsby/dist/entities/Route/routes'
+import EventAttendee from '../EventAttendee/model'
+import RequestError from 'decentraland-gatsby/dist/entities/Route/error'
+import { auth, WithAuth } from 'decentraland-gatsby/dist/entities/Auth/middleware'
+import { EventAttributes, adminPatchAttributes, patchAttributes, EventListOptions, DeprecatedEventAttributes, RecurrentEventAttributes, MAX_EVENT_RECURRENT, SessionEventAttributes } from './types'
+import { withEvent, WithEvent } from './middleware'
+import isAdmin from '../Auth/isAdmin'
+import handle from 'decentraland-gatsby/dist/entities/Route/handle'
+import { bool, integer } from 'decentraland-gatsby/dist/entities/Route/param'
+import { withAuthProfile, WithAuthProfile } from '../Profile/middleware'
+import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent, notifyEventError } from '../Slack/utils'
+import { Request } from 'express'
+import Context from 'decentraland-gatsby/dist/entities/Route/context'
+import isEthereumAddress from 'validator/lib/isEthereumAddress'
+import EventAttendeeModel from '../EventAttendee/model'
+import { EventAttendeeAttributes } from '../EventAttendee/types'
 
 const DECENTRALAND_URL = env('DECENTRALAND_URL', '')
 export const BASE_PATH = '/events/:eventId'
